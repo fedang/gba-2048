@@ -2,5 +2,5 @@
 
 ```
 docker build -t gba-dev:latest .
-docker run -it gba-dev
+docker run --rm -it -v $(pwd):/code gba-dev:latest
 ```
