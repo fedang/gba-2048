@@ -1,4 +1,5 @@
 #include <bn_core.h>
+#include <bn_string.h>
 #include <bn_math.h>
 #include <bn_random.h>
 #include <bn_keypad.h>
@@ -84,12 +85,23 @@ struct block {
 struct board {
     block blocks[4][4];
     bn::random random;
+    bool game_over;
+    int score;
+    int moves;
 
-    board() {
+    bn::sprite_text_generator& text_generator;
+    bn::vector<bn::sprite_ptr, 32> text_sprites;
+
+    board(bn::sprite_text_generator& _tg) : text_generator(_tg) {
         reset();
     }
 
     void reset() {
+        game_over = false;
+        score = 0;
+        moves = 0;
+        text_sprites.clear();
+
         constexpr int size = 32, space = 4;
         constexpr int total = 4 * size + 3 * space;
         constexpr int offset = -total / 2 + size / 2;
@@ -107,8 +119,16 @@ struct board {
     }
 
     void lost() {
-        // TODO: Add a loss text
-        reset();
+        game_over = true;
+
+        bn::string<32> score_text = "Score: " + bn::to_string<32>(score);
+        bn::string<32> moves_text = "Moves: " + bn::to_string<32>(moves);
+
+        text_generator.set_center_alignment();
+        text_generator.generate(0, -16, "GAME OVER", text_sprites);
+        text_generator.generate(0, 0, score_text, text_sprites);
+        text_generator.generate(0, 16, moves_text, text_sprites);
+        text_generator.generate(0, 32, "Press (A) to play again", text_sprites);
     }
 
     void maybe_lost() {
@@ -182,6 +202,7 @@ struct board {
                         blocks[i][k + dir].change_n(2*n);
                         blocks[i][k].change_n(0);
 
+                        score += 2*n;
                         merged[i][k + dir] = true;
                         action = true;
                     }
@@ -189,8 +210,10 @@ struct board {
             }
         }
 
-        if (action)
+        if (action) {
+            moves++;
             spawn();
+        }
     }
 
     void move_y(int dir) {
@@ -221,6 +244,7 @@ struct board {
                         blocks[k + dir][j].change_n(2*n);
                         blocks[k][j].change_n(0);
 
+                        score += 2*n;
                         merged[k + dir][j] = true;
                         action = true;
                     }
@@ -228,38 +252,39 @@ struct board {
             }
         }
 
-        if (action)
+        if (action) {
+            moves++;
             spawn();
+        }
     }
 
     void update() {
         if (bn::keypad::a_pressed())
             return reset();
 
-        if (bn::keypad::up_pressed())
-            return move_y(-1);
+        if (!game_over) {
+            if (bn::keypad::up_pressed())
+                return move_y(-1);
 
-        if (bn::keypad::down_pressed())
-            return move_y(1);
+            if (bn::keypad::down_pressed())
+                return move_y(1);
 
-        if (bn::keypad::left_pressed())
-            return move_x(-1);
+            if (bn::keypad::left_pressed())
+                return move_x(-1);
 
-        if (bn::keypad::right_pressed())
-            return move_x(1);
+            if (bn::keypad::right_pressed())
+                return move_x(1);
+        }
     }
 };
 
 int main()
 {
     bn::core::init();
-
     bn::sprite_text_generator text_generator(common::variable_8x16_sprite_font);
-    text_generator.set_center_alignment();
-
     bn::bg_palettes::set_transparent_color(bn::color(31, 31, 31));
 
-    board board;
+    board board(text_generator);
 
     while(true)
     {
