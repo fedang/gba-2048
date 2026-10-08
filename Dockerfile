@@ -9,7 +9,4 @@ RUN apt-get install python3 python-is-python3
 RUN mkdir -p /game
 WORKDIR /game
 
-RUN useradd -ms /bin/bash user
-USER user
-
 CMD ["/bin/bash"]

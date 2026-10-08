@@ -9,8 +9,21 @@
 #include "bn_sprite_items_block_0.h"
 #include "bn_sprite_items_block_2.h"
 #include "bn_sprite_items_block_4.h"
+#include "bn_sprite_items_block_8.h"
+#include "bn_sprite_items_block_16.h"
+#include "bn_sprite_items_block_32.h"
+#include "bn_sprite_items_block_64.h"
+#include "bn_sprite_items_block_128.h"
+#include "bn_sprite_items_block_256.h"
+#include "bn_sprite_items_block_512.h"
+#include "bn_sprite_items_block_1024.h"
+#include "bn_sprite_items_block_2048.h"
+
 #include "common_info.h"
 #include "common_variable_8x16_sprite_font.h"
+
+#define BLOCK_SPRITE(n) \
+    bn::sprite_items::block_ ## n
 
 struct block {
 	int x, y, n;
@@ -25,14 +38,42 @@ struct block {
 	void change_n(int _n) {
 		n = _n;
 		switch (n) {
+            /* n=0 means empty tile */
 			case 0:
-				sprite = bn::sprite_items::block_0.create_sprite(x, y);
+				sprite = BLOCK_SPRITE(0).create_sprite(x, y);
 				break;
 			case 2:
-				sprite = bn::sprite_items::block_2.create_sprite(x, y);
+				sprite = BLOCK_SPRITE(2).create_sprite(x, y);
 				break;
 			case 4:
-				sprite = bn::sprite_items::block_4.create_sprite(x, y);
+				sprite = BLOCK_SPRITE(4).create_sprite(x, y);
+				break;
+			case 8:
+				sprite = BLOCK_SPRITE(8).create_sprite(x, y);
+				break;
+			case 16:
+				sprite = BLOCK_SPRITE(16).create_sprite(x, y);
+				break;
+			case 32:
+				sprite = BLOCK_SPRITE(32).create_sprite(x, y);
+				break;
+			case 64:
+				sprite = BLOCK_SPRITE(64).create_sprite(x, y);
+				break;
+			case 128:
+				sprite = BLOCK_SPRITE(128).create_sprite(x, y);
+				break;
+			case 256:
+				sprite = BLOCK_SPRITE(256).create_sprite(x, y);
+				break;
+			case 512:
+				sprite = BLOCK_SPRITE(512).create_sprite(x, y);
+				break;
+			case 1024:
+				sprite = BLOCK_SPRITE(1024).create_sprite(x, y);
+				break;
+			case 2048:
+				sprite = BLOCK_SPRITE(2048).create_sprite(x, y);
 				break;
 			default:
 				break;
